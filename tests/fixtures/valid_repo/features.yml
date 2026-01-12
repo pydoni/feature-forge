@@ -1,0 +1,36 @@
+feature_views:
+  - name: customer_transaction_features
+    entity: customer
+    source: transactions
+    features:
+      - name: transaction_count_7d
+        dtype: int64
+        description: "Number of transactions in the last 7 days"
+        aggregation:
+          function: count
+          column: amount
+          window: 7d
+
+      - name: avg_transaction_amount_30d
+        dtype: float64
+        description: "Average transaction amount over 30 days"
+        aggregation:
+          function: avg
+          column: amount
+          window: 30d
+
+      - name: max_transaction_amount_30d
+        dtype: float64
+        aggregation:
+          function: max
+          column: amount
+          window: 30d
+
+  - name: customer_profile_features
+    entity: customer
+    source: user_profiles
+    features:
+      - name: customer_age
+        dtype: int32
+        description: "Customer age"
+        column: age

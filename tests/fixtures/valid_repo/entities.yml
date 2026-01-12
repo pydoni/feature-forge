@@ -1,0 +1,10 @@
+entities:
+  - name: customer
+    join_keys:
+      - customer_id
+    description: "A retail customer"
+
+  - name: merchant
+    join_keys:
+      - merchant_id
+    description: "A merchant accepting payments"

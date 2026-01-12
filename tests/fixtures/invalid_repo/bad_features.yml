@@ -1,0 +1,26 @@
+entities:
+  - name: customer
+    join_keys: [customer_id]
+
+sources:
+  - name: transactions
+    backend: parquet
+    path: data/nonexistent.parquet
+    entity: customer
+    timestamp_column: event_timestamp
+    columns:
+      - { name: customer_id, dtype: int64 }
+      - { name: amount, dtype: float64 }
+      - { name: event_timestamp, dtype: timestamp }
+
+feature_views:
+  - name: bad_feature_view
+    entity: unknown_entity
+    source: unknown_source
+    features:
+      - name: bad_feature
+        dtype: float64
+        aggregation:
+          function: avg
+          column: nonexistent_column
+          window: 7d
