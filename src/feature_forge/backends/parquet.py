@@ -21,12 +21,16 @@ class ParquetBackend:
         conn: duckdb.DuckDBPyConnection,
         source: Source,
         view_name: str,
+        repo_path: str = "",
     ) -> None:
         path = source.path
         if path is None:
             raise ValueError(f"Source '{source.name}' has no 'path' configured")
+        resolved = Path(path)
+        if not resolved.is_absolute() and repo_path:
+            resolved = Path(repo_path) / resolved
         conn.execute(
-            f"CREATE OR REPLACE VIEW {view_name} AS SELECT * FROM read_parquet('{path}')"
+            f"CREATE OR REPLACE VIEW {view_name} AS SELECT * FROM read_parquet('{resolved}')"
         )
 
     def validate_source(self, source: Source, repo_path: str) -> list[ValidationIssue]:

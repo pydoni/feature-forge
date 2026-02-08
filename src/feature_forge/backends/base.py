@@ -29,6 +29,7 @@ class SourceBackend(Protocol):
         conn: duckdb.DuckDBPyConnection,
         source: Source,
         view_name: str,
+        repo_path: str = "",
     ) -> None:
         """Register the source as a DuckDB view so the engine can query it."""
         ...
