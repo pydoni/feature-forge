@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Callable
+
 from feature_forge.backends.base import SourceBackend
 from feature_forge.backends.parquet import ParquetBackend
 from feature_forge.exceptions import BackendError
@@ -10,23 +12,26 @@ from feature_forge.types import BackendType
 
 def _import_s3_backend() -> type:
     from feature_forge.backends.s3 import S3Backend
-
     return S3Backend
 
 
 def _import_sql_backend() -> type:
     from feature_forge.backends.sql import SQLBackend
-
     return SQLBackend
 
 
 def _import_databricks_backend() -> type:
-    from feature_forge.backends.databricks import DatabricksBackend
+    try:
+        from feature_forge.backends.databricks import DatabricksBackend
+        return DatabricksBackend
+    except ImportError as e:
+        raise BackendError(
+            "Databricks backend requires databricks-sql-connector. "
+            "Install with: pip install feature-forge[databricks]"
+        ) from e
 
-    return DatabricksBackend
 
-
-_BACKEND_FACTORIES: dict[BackendType, type | callable] = {
+_BACKEND_FACTORIES: dict[BackendType, type | Callable[[], type]] = {
     BackendType.PARQUET: ParquetBackend,
     BackendType.S3: _import_s3_backend,
     BackendType.SQL: _import_sql_backend,
@@ -48,13 +53,10 @@ def get_backend(backend_type: BackendType | str) -> SourceBackend:
     try:
         cls = factory()
         return cls()
+    except BackendError:
+        raise
     except ImportError as e:
-        extras_map = {
-            BackendType.DATABRICKS: "databricks",
-            BackendType.SPARK: "spark",
-        }
-        extra = extras_map.get(bt, str(bt))
         raise BackendError(
             f"Backend '{bt}' requires additional dependencies. "
-            f"Install with: pip install feature-forge[{extra}]"
+            f"Install with: pip install feature-forge[{bt}]"
         ) from e
