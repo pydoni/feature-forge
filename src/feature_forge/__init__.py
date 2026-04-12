@@ -18,6 +18,7 @@ from feature_forge.registry.models import (
     FeatureView,
     Source,
 )
+from feature_forge.sdk.store import FeatureStore
 from feature_forge.types import AggFunction, BackendType, DType, EngineType
 
 __version__ = "0.1.0"
@@ -35,6 +36,7 @@ __all__ = [
     "Feature",
     "FeatureForgeError",
     "FeatureRegistry",
+    "FeatureStore",
     "FeatureView",
     "MaterializationError",
     "RegistryError",
