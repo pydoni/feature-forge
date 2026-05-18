@@ -2,7 +2,7 @@
 
 Spark SQL does not support ASOF JOIN, so we use window functions:
 - Passthrough features: ROW_NUMBER() OVER (PARTITION BY keys ORDER BY ts DESC) + filter rn=1
-- Aggregation features: time-bounded LEFT JOIN + GROUP BY (same as DuckDB, with INTERVAL syntax adjusted)
+- Aggregation features: time-bounded LEFT JOIN + GROUP BY (same as DuckDB, adjusted INTERVAL)
 
 The entity table must contain a __row_idx column to preserve row identity.
 """
@@ -12,6 +12,9 @@ from __future__ import annotations
 from collections import defaultdict
 
 from feature_forge.registry.models import Feature, FeatureView
+
+_AGG_SEP = ",\n    "
+_SELECT_SEP = ",\n  "
 
 
 def _entity_timestamp_col() -> str:
@@ -38,7 +41,6 @@ def _build_passthrough_cte(
     ets = _entity_timestamp_col()
     key_join = " AND ".join(f"e.{k} = src.{k}" for k in entity_keys)
     feature_cols = ", ".join(f"src.{f.column} AS {f.name}" for f in features)
-    partition_cols = ", ".join(["e.__row_idx"])
 
     return (
         f"{cte_name} AS (\n"
@@ -91,7 +93,7 @@ def _build_agg_cte(
         f"{cte_name} AS (\n"
         f"  SELECT\n"
         f"    e.__row_idx,\n"
-        f"    {',\n    '.join(agg_exprs)}\n"
+        f"    {_AGG_SEP.join(agg_exprs)}\n"
         f"  FROM {entity_table} e\n"
         f"  LEFT JOIN {source_table} src\n"
         f"    ON {key_join}\n"
@@ -181,7 +183,7 @@ def build_spark_pit_query(
         parts.append(f"WITH {entity_cte}")
 
     # SELECT
-    parts.append(f"SELECT\n  {',\n  '.join(select_parts)}")
+    parts.append(f"SELECT\n  {_SELECT_SEP.join(select_parts)}")
     parts.append("FROM entity")
 
     # JOIN CTEs on __row_idx

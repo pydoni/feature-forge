@@ -14,6 +14,13 @@ from collections import defaultdict
 
 from feature_forge.registry.models import Feature, FeatureView
 
+_AGG_SEP = ",\n    "
+_SELECT_SEP = ",\n  "
+
+
+def _join_exprs(exprs: list[str]) -> str:
+    return _AGG_SEP.join(exprs)
+
 
 def _entity_timestamp_col() -> str:
     return "event_timestamp"
@@ -47,7 +54,7 @@ def _build_agg_cte(
         f"{cte_name} AS (\n"
         f"  SELECT\n"
         f"    e.__row_idx,\n"
-        f"    {',\n    '.join(agg_exprs)}\n"
+        f"    {_join_exprs(agg_exprs)}\n"
         f"  FROM {entity_table} e\n"
         f"  LEFT JOIN {source_table} src\n"
         f"    ON {key_join}\n"
@@ -85,7 +92,7 @@ def build_pit_query(
     ctes: list[str] = []
     join_tables: list[str] = []
     select_parts: list[str] = [
-        f"entity.__row_idx",
+        "entity.__row_idx",
         *(f"entity.{k}" for k in entity_keys),
         f"entity.{ets}",
     ]
@@ -126,7 +133,7 @@ def build_pit_query(
         parts.append(f"WITH entity AS (\n  SELECT * FROM {entity_table}\n)")
 
     # SELECT
-    parts.append(f"SELECT\n  {',\n  '.join(select_parts)}")
+    parts.append(f"SELECT\n  {_SELECT_SEP.join(select_parts)}")
     parts.append("FROM entity")
 
     # JOIN aggregation CTEs on __row_idx

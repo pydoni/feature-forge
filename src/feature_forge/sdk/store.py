@@ -11,7 +11,7 @@ import pandas as pd
 from feature_forge.engine.retrieval import retrieve_features
 from feature_forge.engines.base import Engine
 from feature_forge.engines.factory import get_engine
-from feature_forge.exceptions import FeatureForgeError, ValidationError
+from feature_forge.exceptions import FeatureForgeError
 from feature_forge.registry.loader import load_registry
 from feature_forge.registry.models import FeatureRegistry
 from feature_forge.registry.validator import RegistryValidationResult, validate_registry
@@ -183,7 +183,6 @@ class FeatureStore:
     ) -> pd.DataFrame:
         """Build an entity DataFrame from entity_ids and optional date range."""
         # Build the base entity combinations
-        keys = list(entity_ids.keys())
         values = list(entity_ids.values())
 
         # All value lists must have the same length
@@ -202,7 +201,8 @@ class FeatureStore:
 
         # Historical backfill: generate date range
         start = pd.Timestamp(start_date)
-        end = pd.Timestamp(end_date) if end_date else pd.Timestamp.now(tz=timezone.utc).tz_localize(None)
+        now = pd.Timestamp.now(tz=timezone.utc).tz_localize(None)
+        end = pd.Timestamp(end_date) if end_date else now
 
         if interval is None:
             raise FeatureForgeError(

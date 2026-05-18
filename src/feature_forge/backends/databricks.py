@@ -17,6 +17,8 @@ from feature_forge.backends.base import ValidationIssue
 from feature_forge.exceptions import BackendError
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from feature_forge.registry.models import Source
 
 
@@ -49,7 +51,7 @@ class DatabricksBackend:
 
     def _query_via_connector(
         self, source: Source, host: str, warehouse_id: str, token: str
-    ) -> "pyarrow.Table":
+    ) -> Any:
         """Query Databricks via SQL Warehouse using databricks-sql-connector."""
         try:
             from databricks import sql as databricks_sql
@@ -73,17 +75,19 @@ class DatabricksBackend:
             connection_params["http_path"] = f"/sql/1.0/warehouses/{warehouse_id}"
 
         try:
-            with databricks_sql.connect(**connection_params) as conn:
-                with conn.cursor() as cursor:
-                    query = source.query or f"SELECT * FROM {table}"
-                    cursor.execute(query)
-                    return cursor.fetchall_arrow()
+            with (
+                databricks_sql.connect(**connection_params) as conn,
+                conn.cursor() as cursor,
+            ):
+                query = source.query or f"SELECT * FROM {table}"
+                cursor.execute(query)
+                return cursor.fetchall_arrow()
         except Exception as e:
             raise BackendError(
                 f"Failed to query Databricks for source '{source.name}': {e}"
             ) from e
 
-    def _query_via_spark(self, source: Source) -> "pandas.DataFrame":
+    def _query_via_spark(self, source: Source) -> Any:
         """Query via spark.sql() when running inside a Databricks notebook."""
         try:
             from pyspark.sql import SparkSession

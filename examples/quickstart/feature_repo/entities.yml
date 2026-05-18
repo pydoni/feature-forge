@@ -1,0 +1,4 @@
+entities:
+  - name: customer
+    join_keys: [customer_id]
+    description: "A retail customer"

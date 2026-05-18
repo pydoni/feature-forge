@@ -1,0 +1,28 @@
+feature_views:
+  - name: doctor_prescription_features
+    entity: doctor
+    source: prescriptions
+    features:
+      - name: rx_count_30d
+        dtype: int64
+        description: "Prescriptions written in last 30 days"
+        aggregation: { function: count, column: units, window: 30d }
+
+      - name: rx_total_units_30d
+        dtype: int64
+        description: "Total units prescribed in last 30 days"
+        aggregation: { function: sum, column: units, window: 30d }
+
+      - name: rx_distinct_drugs_30d
+        dtype: int64
+        description: "Distinct drug classes prescribed in last 30 days"
+        aggregation: { function: count_distinct, column: drug_class, window: 30d }
+
+  - name: doctor_event_features
+    entity: doctor
+    source: events
+    features:
+      - name: events_attended_90d
+        dtype: int64
+        description: "Medical events attended in last 90 days"
+        aggregation: { function: count, column: event_type, window: 90d }

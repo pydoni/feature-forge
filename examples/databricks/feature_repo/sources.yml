@@ -1,0 +1,27 @@
+# Databricks example: reads from Unity Catalog tables.
+# Requires: pip install feature-forge[databricks]
+# Environment variables: DATABRICKS_HOST, DATABRICKS_TOKEN, DATABRICKS_WAREHOUSE_ID
+
+sources:
+  - name: prescriptions
+    backend: databricks
+    table: catalog.pharma.prescriptions
+    host: adb-123456.azuredatabricks.net  # or set DATABRICKS_HOST env var
+    warehouse_id: abc123def               # or set DATABRICKS_WAREHOUSE_ID env var
+    entity: doctor
+    timestamp_column: prescribed_at
+    columns:
+      - { name: doctor_id, dtype: int64 }
+      - { name: drug_class, dtype: varchar }
+      - { name: units, dtype: int64 }
+      - { name: prescribed_at, dtype: timestamp }
+
+  - name: events
+    backend: databricks
+    table: catalog.pharma.medical_events
+    entity: doctor
+    timestamp_column: event_date
+    columns:
+      - { name: doctor_id, dtype: int64 }
+      - { name: event_type, dtype: varchar }
+      - { name: event_date, dtype: timestamp }

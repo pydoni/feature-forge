@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 from feature_forge.backends.base import SourceBackend
 from feature_forge.backends.parquet import ParquetBackend

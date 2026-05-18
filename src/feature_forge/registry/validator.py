@@ -78,9 +78,7 @@ def validate_registry(registry: FeatureRegistry, repo_path: str) -> RegistryVali
 
         # Validate each feature
         for feature in fv.features:
-            if feature.column is not None:
-                # Passthrough: column must exist in source
-                if feature.column not in source_col_names:
+            if feature.column is not None and feature.column not in source_col_names:
                     issues.append(
                         ValidationIssue(
                             fv.name,

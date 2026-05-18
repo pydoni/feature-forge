@@ -156,30 +156,33 @@ class TestGetFeaturesTableErrors:
                 "event_timestamp": pd.to_datetime(["2025-01-10"]),
             }
         )
-        with FeatureStore(feature_repo) as store:
-            with pytest.raises(FeatureForgeError, match="not both"):
-                store.get_features_table(
-                    entity_df=entity_df,
-                    entity_ids={"customer_id": [1]},
-                    feature_views=["customer_transaction_features"],
-                )
+        with FeatureStore(feature_repo) as store, pytest.raises(
+            FeatureForgeError, match="not both"
+        ):
+            store.get_features_table(
+                entity_df=entity_df,
+                entity_ids={"customer_id": [1]},
+                feature_views=["customer_transaction_features"],
+            )
 
     def test_neither_entity_df_nor_ids_raises(self, feature_repo: Path):
-        with FeatureStore(feature_repo) as store:
-            with pytest.raises(FeatureForgeError, match="Must provide"):
-                store.get_features_table(
-                    feature_views=["customer_transaction_features"],
-                )
+        with FeatureStore(feature_repo) as store, pytest.raises(
+            FeatureForgeError, match="Must provide"
+        ):
+            store.get_features_table(
+                feature_views=["customer_transaction_features"],
+            )
 
     def test_backfill_without_interval_raises(self, feature_repo: Path):
-        with FeatureStore(feature_repo) as store:
-            with pytest.raises(FeatureForgeError, match="interval"):
-                store.get_features_table(
-                    entity_ids={"customer_id": [1]},
-                    feature_views=["customer_transaction_features"],
-                    start_date="2025-01-01",
-                    end_date="2025-01-10",
-                )
+        with FeatureStore(feature_repo) as store, pytest.raises(
+            FeatureForgeError, match="interval"
+        ):
+            store.get_features_table(
+                entity_ids={"customer_id": [1]},
+                feature_views=["customer_transaction_features"],
+                start_date="2025-01-01",
+                end_date="2025-01-10",
+            )
 
 
 class TestMaterialize:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -145,13 +145,15 @@ class TestDatabricksCredentials:
             timestamp_column="ts",
             columns=[],
         )
-        with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(BackendError, match="host"):
-                databricks_backend._get_credentials(source)
+        with patch.dict(os.environ, {}, clear=True), pytest.raises(
+            BackendError, match="host"
+        ):
+            databricks_backend._get_credentials(source)
 
     def test_get_credentials_missing_token_raises_outside(
         self, databricks_backend: DatabricksBackend, databricks_source: Source
     ):
-        with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(BackendError, match="TOKEN"):
-                databricks_backend._get_credentials(databricks_source)
+        with patch.dict(os.environ, {}, clear=True), pytest.raises(
+            BackendError, match="TOKEN"
+        ):
+            databricks_backend._get_credentials(databricks_source)

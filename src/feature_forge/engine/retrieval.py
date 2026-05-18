@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Union
-
 import pandas as pd
 
 from feature_forge.backends.factory import get_backend
@@ -65,7 +63,7 @@ def retrieve_features(
     entity_df: pd.DataFrame,
     feature_view_names: list[str],
     registry: FeatureRegistry,
-    engine: Union[DuckDBEngine, Engine],
+    engine: DuckDBEngine | Engine,
     repo_path: str,
 ) -> pd.DataFrame:
     """Execute PIT joins for the requested feature views and merge results.

@@ -1,0 +1,21 @@
+sources:
+  - name: transactions
+    backend: parquet
+    path: data/transactions.parquet
+    entity: customer
+    timestamp_column: event_timestamp
+    columns:
+      - { name: customer_id, dtype: int64 }
+      - { name: amount, dtype: float64 }
+      - { name: event_timestamp, dtype: timestamp }
+      - { name: merchant_id, dtype: varchar }
+
+  - name: profiles
+    backend: parquet
+    path: data/profiles.parquet
+    entity: customer
+    timestamp_column: updated_at
+    columns:
+      - { name: customer_id, dtype: int64 }
+      - { name: age, dtype: int32 }
+      - { name: updated_at, dtype: timestamp }

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -110,7 +109,7 @@ def init(
 
 @app.command()
 def validate(
-    repo: Optional[str] = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
+    repo: str | None = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
 ) -> None:
     """Validate the feature registry (schema, cross-references, sources)."""
     from feature_forge.registry.loader import load_registry
@@ -122,7 +121,7 @@ def validate(
         registry = load_registry(repo_path)
     except Exception as e:
         console.print(f"[red]Error loading registry:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     result = validate_registry(registry, str(repo_path))
 
@@ -143,7 +142,7 @@ def validate(
             console.print(f"\n[yellow]{len(warnings)} warning(s):[/yellow]")
             for w in warnings:
                 console.print(f"  [yellow]WARN[/yellow] [{w.source_name}] {w.message}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 @app.command(name="list")
@@ -151,7 +150,7 @@ def list_items(
     kind: str = typer.Argument(
         ..., help="What to list: entities, sources, or features"
     ),
-    repo: Optional[str] = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
+    repo: str | None = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
 ) -> None:
     """List registered entities, sources, or feature views."""
     from feature_forge.registry.loader import load_registry
@@ -162,7 +161,7 @@ def list_items(
         registry = load_registry(repo_path)
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     if kind == "entities":
         table = Table(title="Entities")
@@ -208,7 +207,7 @@ def list_items(
 @app.command()
 def describe(
     feature_view: str = typer.Argument(..., help="Name of the feature view to describe"),
-    repo: Optional[str] = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
+    repo: str | None = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
 ) -> None:
     """Show detailed info about a feature view."""
     from feature_forge.registry.loader import load_registry
@@ -219,7 +218,7 @@ def describe(
         registry = load_registry(repo_path)
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     fv = registry.get_feature_view(feature_view)
     if fv is None:
@@ -266,8 +265,8 @@ def materialize(
         ..., "--entity-values", help="Comma-separated entity values"
     ),
     interval: str = typer.Option("1d", "--interval", help="Time interval (e.g. 1d, 7d, 1h)"),
-    output: Optional[str] = typer.Option(None, "--output", "-o", help="Output Parquet path"),
-    repo: Optional[str] = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
+    output: str | None = typer.Option(None, "--output", "-o", help="Output Parquet path"),
+    repo: str | None = typer.Option(None, "--repo", "-r", help="Path to feature repo"),
     engine: str = typer.Option("duckdb", "--engine", help="Query engine (duckdb or spark)"),
 ) -> None:
     """Materialize a feature view to a Parquet file."""
@@ -296,4 +295,4 @@ def materialize(
         console.print(f"[green]Materialized to {output_path}[/green]")
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e

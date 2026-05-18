@@ -1,0 +1,4 @@
+entities:
+  - name: doctor
+    join_keys: [doctor_id]
+    description: "A medical doctor"
