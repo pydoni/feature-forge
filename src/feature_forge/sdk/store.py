@@ -33,18 +33,28 @@ class FeatureStore:
         )
     """
 
+    _DEFAULT_ENGINE = object()  # sentinel to detect "user didn't pass engine"
+
     def __init__(
         self,
         repo_path: str | Path,
-        engine: str | EngineType = EngineType.DUCKDB,
+        engine: str | EngineType | object = _DEFAULT_ENGINE,
     ) -> None:
         self._repo_path = Path(repo_path).resolve()
-        self._registry = load_registry(self._repo_path)
 
-        # Engine from constructor takes priority, then YAML config
-        engine_type = engine if engine != EngineType.DUCKDB else self._registry.engine
-        self._engine: Engine = get_engine(engine_type)
-        self._engine.connect()
+        try:
+            self._registry = load_registry(self._repo_path)
+        except Exception as e:
+            raise FeatureForgeError(f"Failed to load registry: {e}") from e
+
+        # User-provided engine takes priority; otherwise fall back to YAML config
+        engine_type = self._registry.engine if engine is self._DEFAULT_ENGINE else engine
+
+        try:
+            self._engine: Engine = get_engine(engine_type)
+            self._engine.connect()
+        except Exception as e:
+            raise FeatureForgeError(f"Failed to initialize engine: {e}") from e
 
     @property
     def registry(self) -> FeatureRegistry:
@@ -109,7 +119,8 @@ class FeatureStore:
         if entity_ids is not None:
             entity_df = self._build_entity_df(entity_ids, start_date, end_date, interval)
 
-        assert entity_df is not None
+        if entity_df is None:
+            raise FeatureForgeError("entity_df resolved to None unexpectedly")
         return retrieve_features(
             entity_df=entity_df,
             feature_view_names=feature_views,

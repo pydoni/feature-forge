@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import duckdb
 
-from feature_forge.backends.base import ValidationIssue
+from feature_forge.backends.base import ValidationIssue, _escape_sql_string
 from feature_forge.exceptions import BackendError
 
 if TYPE_CHECKING:
@@ -40,20 +40,21 @@ class S3Backend:
             key_id = os.environ.get("AWS_ACCESS_KEY_ID", "")
             secret = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
             if region:
-                conn.execute(f"SET s3_region = '{region}';")
+                conn.execute(f"SET s3_region = '{_escape_sql_string(region)}';")
             if key_id and secret:
-                conn.execute(f"SET s3_access_key_id = '{key_id}';")
-                conn.execute(f"SET s3_secret_access_key = '{secret}';")
+                conn.execute(f"SET s3_access_key_id = '{_escape_sql_string(key_id)}';")
+                conn.execute(f"SET s3_secret_access_key = '{_escape_sql_string(secret)}';")
             session_token = os.environ.get("AWS_SESSION_TOKEN", "")
             if session_token:
-                conn.execute(f"SET s3_session_token = '{session_token}';")
+                conn.execute(f"SET s3_session_token = '{_escape_sql_string(session_token)}';")
         elif uri.startswith("gs://") or uri.startswith("gcs://"):
-            # GCS uses S3-compatible API through DuckDB
             conn.execute("SET s3_endpoint = 'storage.googleapis.com';")
         elif uri.startswith("az://") or uri.startswith("abfss://"):
             conn_str = os.environ.get("AZURE_STORAGE_CONNECTION_STRING", "")
             if conn_str:
-                conn.execute(f"SET azure_storage_connection_string = '{conn_str}';")
+                conn.execute(
+                    f"SET azure_storage_connection_string = '{_escape_sql_string(conn_str)}';"
+                )
 
     def register_source(
         self,
@@ -69,8 +70,9 @@ class S3Backend:
         self._ensure_httpfs(conn)
         self._configure_credentials(conn, uri)
 
+        escaped = _escape_sql_string(uri)
         conn.execute(
-            f"CREATE OR REPLACE VIEW {view_name} AS SELECT * FROM read_parquet('{uri}')"
+            f"CREATE OR REPLACE VIEW {view_name} AS SELECT * FROM read_parquet('{escaped}')"
         )
 
     def validate_source(self, source: Source, repo_path: str) -> list[ValidationIssue]:

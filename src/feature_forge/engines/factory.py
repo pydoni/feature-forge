@@ -10,7 +10,13 @@ from feature_forge.types import EngineType
 
 def get_engine(engine_type: EngineType | str = EngineType.DUCKDB) -> Engine:
     """Get an engine instance by type name."""
-    et = EngineType(engine_type)
+    try:
+        et = EngineType(engine_type)
+    except ValueError:
+        valid = ", ".join(e.value for e in EngineType)
+        raise EngineError(
+            f"Unknown engine type: '{engine_type}'. Valid options: {valid}"
+        ) from None
 
     if et == EngineType.DUCKDB:
         return DuckDBEngine()

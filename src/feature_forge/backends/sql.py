@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import duckdb
 
-from feature_forge.backends.base import ValidationIssue
+from feature_forge.backends.base import ValidationIssue, _escape_sql_string
 from feature_forge.exceptions import BackendError
 
 if TYPE_CHECKING:
@@ -23,9 +23,6 @@ class SQLBackend:
     - SQLite: path to .db file (e.g., "data/events.db")
     - PostgreSQL: standard connection string (e.g., "host=localhost dbname=mydb")
     """
-
-    def __init__(self) -> None:
-        self._attached_dbs: set[str] = set()
 
     def _detect_db_type(self, connection_string: str) -> str:
         """Detect database type from connection string."""
@@ -65,18 +62,21 @@ class SQLBackend:
         # Use source name as the attached db alias
         db_alias = f"__sqldb_{source.name}"
 
-        if db_alias not in self._attached_dbs:
-            # Resolve relative paths for SQLite
-            if db_type == "SQLITE":
-                from pathlib import Path
+        # Resolve relative paths for SQLite
+        if db_type == "SQLITE":
+            from pathlib import Path
 
-                resolved = Path(cs)
-                if not resolved.is_absolute() and repo_path:
-                    resolved = Path(repo_path) / resolved
-                cs = str(resolved)
+            resolved = Path(cs)
+            if not resolved.is_absolute() and repo_path:
+                resolved = Path(repo_path) / resolved
+            cs = str(resolved)
 
-            conn.execute(f"ATTACH '{cs}' AS {db_alias} (TYPE {db_type}, READ_ONLY);")
-            self._attached_dbs.add(db_alias)
+        # ATTACH is idempotent if already attached; catch and ignore duplicate errors
+        try:
+            escaped_cs = _escape_sql_string(cs)
+            conn.execute(f"ATTACH '{escaped_cs}' AS {db_alias} (TYPE {db_type}, READ_ONLY);")
+        except duckdb.CatalogException:
+            pass  # Already attached
 
         # Create view from query or full table
         if source.query:

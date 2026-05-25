@@ -49,7 +49,7 @@ def _build_passthrough_cte(
         f"    {feature_cols},\n"
         f"    ROW_NUMBER() OVER (\n"
         f"      PARTITION BY e.__row_idx\n"
-        f"      ORDER BY src.{source_ts_col} DESC\n"
+        f"      ORDER BY src.{source_ts_col} DESC NULLS LAST\n"
         f"    ) AS __rn\n"
         f"  FROM {entity_table} e\n"
         f"  LEFT JOIN {source_table} src\n"
@@ -76,7 +76,8 @@ def _build_agg_cte(
     """Build a CTE for aggregation features with a time window."""
     agg_exprs: list[str] = []
     for f in features:
-        assert f.aggregation is not None
+        if f.aggregation is None:
+            raise ValueError(f"Feature '{f.name}' has no aggregation defined")
         func = f.aggregation.function.value
         col = f.aggregation.column
 
@@ -122,7 +123,8 @@ def build_spark_pit_query(
     # Group aggregation features by window
     window_groups: dict[str, list[Feature]] = defaultdict(list)
     for f in agg_features:
-        assert f.aggregation is not None
+        if f.aggregation is None:
+            raise ValueError(f"Feature '{f.name}' has no aggregation defined")
         window_groups[f.aggregation.window_to_interval()].append(f)
 
     ets = _entity_timestamp_col()

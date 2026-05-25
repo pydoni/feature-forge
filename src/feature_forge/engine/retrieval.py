@@ -30,7 +30,8 @@ def _register_source_for_engine(
 ) -> None:
     """Register a source in the engine, handling DuckDB vs Spark differences."""
     from feature_forge.registry.models import Source
-    assert isinstance(source, Source)
+    if not isinstance(source, Source):
+        raise TypeError(f"Expected Source instance, got {type(source).__name__}")
 
     backend = get_backend(source.backend)
 

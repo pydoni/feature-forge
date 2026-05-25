@@ -41,7 +41,13 @@ _BACKEND_FACTORIES: dict[BackendType, type | Callable[[], type]] = {
 
 def get_backend(backend_type: BackendType | str) -> SourceBackend:
     """Get a backend instance by type name."""
-    bt = BackendType(backend_type)
+    try:
+        bt = BackendType(backend_type)
+    except ValueError:
+        raise BackendError(
+            f"Unknown backend type: '{backend_type}'. "
+            f"Valid options: {', '.join(e.value for e in BackendType)}"
+        ) from None
     factory = _BACKEND_FACTORIES.get(bt)
     if factory is None:
         raise BackendError(f"Unknown backend type: {backend_type}")

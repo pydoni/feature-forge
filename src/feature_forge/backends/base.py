@@ -20,6 +20,11 @@ class ValidationIssue:
     level: str = "error"  # "error" or "warning"
 
 
+def _escape_sql_string(value: str) -> str:
+    """Escape single quotes in a SQL string literal to prevent injection."""
+    return value.replace("'", "''")
+
+
 @runtime_checkable
 class SourceBackend(Protocol):
     """Protocol that all source backends must implement."""

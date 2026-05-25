@@ -223,6 +223,53 @@ class TestMaterialize:
         assert len(df) == 3
 
 
+class TestEdgeCases:
+    def test_empty_entity_df(self, feature_repo: Path):
+        """Empty entity_df should return empty DataFrame with correct columns."""
+        entity_df = pd.DataFrame(
+            {
+                "customer_id": pd.Series([], dtype="int64"),
+                "event_timestamp": pd.Series([], dtype="datetime64[ns]"),
+            }
+        )
+        with FeatureStore(feature_repo) as store:
+            result = store.get_features_table(
+                entity_df=entity_df,
+                feature_views=["customer_transaction_features"],
+            )
+        assert len(result) == 0
+        assert "transaction_count_7d" in result.columns
+
+    def test_missing_event_timestamp_column(self, feature_repo: Path):
+        entity_df = pd.DataFrame({"customer_id": [1]})
+        with FeatureStore(feature_repo) as store, pytest.raises(
+            Exception, match="event_timestamp"
+        ):
+            store.get_features_table(
+                entity_df=entity_df,
+                feature_views=["customer_transaction_features"],
+            )
+
+    def test_invalid_engine_type(self, feature_repo: Path):
+        with pytest.raises(FeatureForgeError, match="engine"):
+            FeatureStore(feature_repo, engine="nonexistent_engine")
+
+    def test_nonexistent_feature_view(self, feature_repo: Path):
+        entity_df = pd.DataFrame(
+            {
+                "customer_id": [1],
+                "event_timestamp": pd.to_datetime(["2025-01-10"]),
+            }
+        )
+        with FeatureStore(feature_repo) as store, pytest.raises(
+            Exception, match="not found"
+        ):
+            store.get_features_table(
+                entity_df=entity_df,
+                feature_views=["nonexistent_view"],
+            )
+
+
 class TestIntervalParsing:
     def test_valid_intervals(self):
         assert FeatureStore._parse_interval_to_freq("1d") == "1D"

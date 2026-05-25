@@ -21,7 +21,8 @@ class DuckDBEngine:
     def conn(self) -> duckdb.DuckDBPyConnection:
         if self._conn is None:
             self.connect()
-        assert self._conn is not None
+        if self._conn is None:
+            raise EngineError("DuckDB connection failed to initialize")
         return self._conn
 
     def connect(self) -> None:

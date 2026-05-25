@@ -82,7 +82,9 @@ class Aggregation(BaseModel):
     def window_to_interval(self) -> str:
         """Convert window string to SQL INTERVAL string."""
         match = _WINDOW_PATTERN.match(self.window)
-        assert match is not None
+        if match is None:
+            raise ValueError(f"Invalid window format: {self.window}")
+
         value, unit = match.group(1), match.group(2)
         unit_map = {"d": "days", "h": "hours", "m": "minutes"}
         return f"{value} {unit_map[unit]}"

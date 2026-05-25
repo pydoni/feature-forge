@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from feature_forge.backends.base import ValidationIssue
 from feature_forge.backends.factory import get_backend
 from feature_forge.registry.models import FeatureRegistry
-from feature_forge.types import AggFunction
+from feature_forge.types import AggFunction, DType
 
 
 @dataclass
@@ -104,13 +104,12 @@ def validate_registry(registry: FeatureRegistry, repo_path: str) -> RegistryVali
                 if feature.aggregation.function in (
                     AggFunction.COUNT,
                     AggFunction.COUNT_DISTINCT,
-                ) and feature.dtype != "int64":
+                ) and feature.dtype != DType.INT64:
                     issues.append(
                         ValidationIssue(
                             fv.name,
                             f"Feature '{feature.name}' uses {feature.aggregation.function} "
                             f"but dtype is '{feature.dtype}' (expected 'int64')",
-                            level="warning",
                         )
                     )
 

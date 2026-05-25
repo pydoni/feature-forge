@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import duckdb
 
-from feature_forge.backends.base import ValidationIssue
+from feature_forge.backends.base import ValidationIssue, _escape_sql_string
 
 if TYPE_CHECKING:
     from feature_forge.registry.models import Source
@@ -29,8 +29,9 @@ class ParquetBackend:
         resolved = Path(path)
         if not resolved.is_absolute() and repo_path:
             resolved = Path(repo_path) / resolved
+        escaped = _escape_sql_string(str(resolved))
         conn.execute(
-            f"CREATE OR REPLACE VIEW {view_name} AS SELECT * FROM read_parquet('{resolved}')"
+            f"CREATE OR REPLACE VIEW {view_name} AS SELECT * FROM read_parquet('{escaped}')"
         )
 
     def validate_source(self, source: Source, repo_path: str) -> list[ValidationIssue]:
@@ -51,9 +52,10 @@ class ParquetBackend:
             return issues
 
         try:
+            escaped = _escape_sql_string(str(resolved))
             conn = duckdb.connect(":memory:")
             actual_columns = conn.execute(
-                f"SELECT column_name FROM (DESCRIBE SELECT * FROM read_parquet('{resolved}'))"
+                f"SELECT column_name FROM (DESCRIBE SELECT * FROM read_parquet('{escaped}'))"
             ).fetchall()
             conn.close()
             actual_names = {row[0] for row in actual_columns}
