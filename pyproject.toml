@@ -1,6 +1,6 @@
 [project]
 name = "feature-forge"
-version = "0.1.0"
+version = "1.0.0"
 description = "Lightweight feature store for small and medium teams"
 readme = "README.md"
 license = "Apache-2.0"
@@ -10,7 +10,7 @@ authors = [
 requires-python = ">=3.10"
 keywords = ["feature-store", "ml", "machine-learning", "duckdb", "features"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.10",
