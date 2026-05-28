@@ -1,6 +1,6 @@
 [project]
 name = "fforge"
-version = "1.0.0"
+version = "1.0.1"
 description = "Lightweight feature store for small and medium teams"
 readme = "README.md"
 license = {text = "Apache-2.0"}

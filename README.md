@@ -153,6 +153,10 @@ uv sync --extra dev
 uv run pytest
 ```
 
+## Support
+
+**[Support this project](https://wise.com/pay/me/pedrohenriquef557?utm_source=request_flow)** - If feature-forge is useful to you, consider helping cover development costs.
+
 ## License
 
 Apache 2.0
