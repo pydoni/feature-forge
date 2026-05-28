@@ -5,15 +5,15 @@ Lightweight feature store for small and medium ML teams. Define features in YAML
 ## Install
 
 ```bash
-pip install feature-forge
+pip install fforge
 ```
 
 With optional backends:
 
 ```bash
-pip install feature-forge[databricks]   # Databricks Unity Catalog
-pip install feature-forge[spark]        # PySpark engine
-pip install feature-forge[all]          # Everything
+pip install fforge[databricks]   # Databricks Unity Catalog
+pip install fforge[spark]        # PySpark engine
+pip install fforge[all]          # Everything
 ```
 
 ## What it does

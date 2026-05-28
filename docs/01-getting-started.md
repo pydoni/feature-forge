@@ -10,7 +10,7 @@ This guide walks you through your first feature-forge project in under 5 minutes
 ## 1. Install
 
 ```bash
-pip install feature-forge
+pip install fforge
 ```
 
 ## 2. Initialize a feature repo

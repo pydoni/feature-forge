@@ -100,7 +100,7 @@ Alternatively, use `table` instead of `query`:
 Unity Catalog tables via SQL Warehouse or native Spark.
 
 ```bash
-pip install feature-forge[databricks]
+pip install fforge[databricks]
 ```
 
 ```yaml

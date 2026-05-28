@@ -29,7 +29,7 @@ def get_engine(engine_type: EngineType | str = EngineType.DUCKDB) -> Engine:
         except ImportError as e:
             raise EngineError(
                 "Spark engine requires PySpark. "
-                "Install with: pip install feature-forge[spark]"
+                "Install with: pip install fforge[spark]"
             ) from e
 
     raise EngineError(f"Unknown engine type: {engine_type}")

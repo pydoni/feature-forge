@@ -1,6 +1,6 @@
 """PySpark query engine implementation.
 
-Requires: pip install feature-forge[spark]
+Requires: pip install fforge[spark]
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ class SparkEngine:
         except ImportError as e:
             raise EngineError(
                 "SparkEngine requires PySpark. "
-                "Install with: pip install feature-forge[spark]"
+                "Install with: pip install fforge[spark]"
             ) from e
 
     def close(self) -> None:

@@ -1,9 +1,9 @@
 [project]
-name = "feature-forge"
+name = "fforge"
 version = "1.0.0"
 description = "Lightweight feature store for small and medium teams"
 readme = "README.md"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 authors = [
     { name = "Pedro Fabris" },
 ]
@@ -32,7 +32,7 @@ dependencies = [
 [project.optional-dependencies]
 spark = ["pyspark>=3.5"]
 databricks = ["databricks-sql-connector>=3.0"]
-all = ["feature-forge[spark,databricks]"]
+all = ["fforge[spark,databricks]"]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",

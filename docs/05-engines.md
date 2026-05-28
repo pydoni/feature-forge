@@ -22,7 +22,7 @@ store = FeatureStore("my_features/", engine="duckdb")  # explicit
 Distributed SQL engine for large-scale data.
 
 ```bash
-pip install feature-forge[spark]
+pip install fforge[spark]
 ```
 
 ```python
@@ -43,7 +43,7 @@ store = FeatureStore("my_features/", engine="spark")
 
 | Criteria | DuckDB | PySpark |
 |----------|--------|---------|
-| Setup | `pip install feature-forge` | `pip install feature-forge[spark]` + Java |
+| Setup | `pip install fforge` | `pip install fforge[spark]` + Java |
 | Data size | Up to ~100GB | Unlimited (cluster) |
 | Speed (small data) | Very fast | Slow (JVM startup overhead) |
 | Speed (large data) | Good | Better (distributed) |

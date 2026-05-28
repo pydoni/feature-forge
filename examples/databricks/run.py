@@ -1,7 +1,7 @@
 """Databricks example: using feature-forge with Unity Catalog tables.
 
 Prerequisites:
-    pip install feature-forge[databricks]
+    pip install fforge[databricks]
     export DATABRICKS_HOST=adb-123456.azuredatabricks.net
     export DATABRICKS_TOKEN=dapi...
     export DATABRICKS_WAREHOUSE_ID=abc123def

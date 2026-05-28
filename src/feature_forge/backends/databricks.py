@@ -58,7 +58,7 @@ class DatabricksBackend:
         except ImportError as e:
             raise BackendError(
                 "Databricks backend requires databricks-sql-connector. "
-                "Install with: pip install feature-forge[databricks]"
+                "Install with: pip install fforge[databricks]"
             ) from e
 
         table = source.table

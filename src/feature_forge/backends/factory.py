@@ -27,7 +27,7 @@ def _import_databricks_backend() -> type:
     except ImportError as e:
         raise BackendError(
             "Databricks backend requires databricks-sql-connector. "
-            "Install with: pip install feature-forge[databricks]"
+            "Install with: pip install fforge[databricks]"
         ) from e
 
 
@@ -64,5 +64,5 @@ def get_backend(backend_type: BackendType | str) -> SourceBackend:
     except ImportError as e:
         raise BackendError(
             f"Backend '{bt}' requires additional dependencies. "
-            f"Install with: pip install feature-forge[{bt}]"
+            f"Install with: pip install fforge[{bt}]"
         ) from e
